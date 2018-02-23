@@ -1,15 +1,13 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\linkit\Plugin\Linkit\Matcher\NodeMatcher.
- */
-
 namespace Drupal\tieto_linkit\Plugin\Linkit\Matcher;
 
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\node\NodeInterface;
 
 /**
+ * Tieto Node Matcher.
+ *
  * @Matcher(
  *   id = "entity:node",
  *   target_entity = "node",
@@ -81,9 +79,9 @@ class TietoNodeMatcher extends TietoEntityMatcher {
   protected function buildEntityQuery($match) {
     $query = parent::buildEntityQuery($match);
 
-    $no_access = !$this->currentUser->hasPermission('bypass node access') && !count($this->moduleHandler->getImplementations('node_grants'));
-    if ($this->configuration['include_unpublished'] !== TRUE || $no_access) {
-      $query->condition('status', NODE_PUBLISHED);
+    $no_access = !$this->currentUser->hasPermission('bypass node access') && !\count($this->moduleHandler->getImplementations('node_grants'));
+    if ($no_access || $this->configuration['include_unpublished'] !== TRUE) {
+      $query->condition('status', NodeInterface::PUBLISHED);
     }
 
     return $query;

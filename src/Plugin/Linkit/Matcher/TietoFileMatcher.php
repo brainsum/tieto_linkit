@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\linkit\Plugin\Linkit\Matcher\FileMatcher.
- */
-
 namespace Drupal\tieto_linkit\Plugin\Linkit\Matcher;
 
 use Drupal\Core\Form\FormStateInterface;
@@ -12,6 +7,8 @@ use Drupal\image\Entity\ImageStyle;
 use Drupal\linkit\Utility\LinkitXss;
 
 /**
+ * Tieto File Matcher.
+ *
  * @Matcher(
  *   id = "entity:file",
  *   target_entity = "file",
@@ -37,9 +34,9 @@ class TietoFileMatcher extends TietoEntityMatcher {
 
     if ($this->moduleHandler->moduleExists('image') && $this->configuration['images']['show_thumbnail']) {
       $image_style = ImageStyle::load($this->configuration['images']['thumbnail_image_style']);
-        if (!is_null($image_style)) {
-          $summery[] = $this->t('Thumbnail style: @thumbnail_style', [
-          '@thumbnail_style' =>  $image_style->label(),
+      if (NULL !== $image_style) {
+        $summery[] = $this->t('Thumbnail style: @thumbnail_style', [
+          '@thumbnail_style' => $image_style->label(),
         ]);
       }
     }
@@ -82,12 +79,12 @@ class TietoFileMatcher extends TietoEntityMatcher {
   public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
     $form = parent::buildConfigurationForm($form, $form_state);
 
-    $form['images'] = array(
+    $form['images'] = [
       '#type' => 'details',
       '#title' => t('Image file settings'),
       '#description' => t('Extra settings for image files in the result.'),
       '#tree' => TRUE,
-    );
+    ];
 
     $form['images']['show_dimensions'] = [
       '#title' => t('Show pixel dimensions'),
@@ -146,7 +143,7 @@ class TietoFileMatcher extends TietoEntityMatcher {
    * {@inheritdoc}
    */
   protected function buildDescription($entity) {
-    $description_array = array();
+    $description_array = [];
 
     $description_array[] = parent::buildDescription($entity);
 
@@ -161,18 +158,18 @@ class TietoFileMatcher extends TietoEntityMatcher {
       }
 
       if ($this->configuration['images']['show_thumbnail'] && $this->moduleHandler->moduleExists('image')) {
-        $image_element = array(
+        $image_element = [
           '#weight' => -10,
           '#theme' => 'image_style',
           '#style_name' => $this->configuration['images']['thumbnail_image_style'],
           '#uri' => $entity->getFileUri(),
-        );
+        ];
 
         $description_array[] = (string) \Drupal::service('renderer')->render($image_element);
       }
     }
 
-    $description = implode('<br />' , $description_array);
+    $description = implode('<br />', $description_array);
     return LinkitXss::descriptionFilter($description);
   }
 
@@ -182,8 +179,9 @@ class TietoFileMatcher extends TietoEntityMatcher {
    * The file entity still uses url() even though it's deprecated in the
    * entity interface.
    */
-  protected function buildPath($entity) {
+  protected function buildPath($entity) : string {
     /** @var \Drupal\file\FileInterface $entity */
     return file_url_transform_relative(file_create_url($entity->getFileUri()));
   }
+
 }

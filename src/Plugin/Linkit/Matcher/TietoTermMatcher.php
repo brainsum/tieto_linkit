@@ -1,16 +1,13 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\linkit\Plugin\Linkit\Matcher\TermMatcher.
- */
-
 namespace Drupal\tieto_linkit\Plugin\Linkit\Matcher;
 
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\linkit\Utility\LinkitXss;
 
 /**
+ * Tieto Term Matcher.
+ *
  * @Matcher(
  *   id = "entity:taxonomy_term",
  *   target_entity = "taxonomy_term",
